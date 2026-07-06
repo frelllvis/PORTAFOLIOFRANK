@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subir Trabajo · Portafolio</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <span class="icon">◈</span>
+      <span id="nav-name">Portafolio</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Inicio</a></li>
+      <li><a href="perfil.html">Mi Perfil</a></li>
+      <li><a href="curso.html">Curso & Docente</a></li>
+      <li><a href="trabajos.html">Trabajos</a></li>
+      <li class="admin-only"><a href="subir.html" class="btn-upload active">+ Subir Trabajo</a></li>
+    </ul>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+
+  <div class="breadcrumb">
+    <a href="../index.html">Inicio</a> / <a href="trabajos.html">Trabajos</a> / Subir
+  </div>
+
+  <div class="page-header">
+    <h1>Subir Trabajo</h1>
+    <p id="page-sub">Agrega un nuevo trabajo a tu portafolio.</p>
+  </div>
+
+  <!-- BLOQUEO si no es admin -->
+  <div id="blocked-msg" style="display:none; max-width:520px; margin: 0 auto 3rem; text-align:center; padding: 0 2rem;">
+    <div class="empty-state">
+      <span>🔒</span>
+      <p>Esta página es solo para el administrador.<br>
+        <a href="#" onclick="openLoginModal()">Iniciar sesión</a> para acceder.
+      </p>
+    </div>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div id="upload-form" class="section" style="padding-top:0; max-width:750px;">
+
+    <div id="alert-upload"></div>
+
+    <div class="form-card">
+      <h2>📋 Detalles del Trabajo</h2>
+
+      <div class="form-group">
+        <label>Título del Trabajo *</label>
+        <input type="text" id="f-titulo" placeholder="Ej. Análisis de Regresión Múltiple — Práctica 3"/>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea id="f-desc" placeholder="Describe brevemente el trabajo, qué contiene, metodología usada, etc."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Categoría / Tipo</label>
+          <select id="f-cat">
+            <option value="">— Detectar automáticamente —</option>
+            <option value="pdf">📄 Reporte PDF</option>
+            <option value="r">📊 Código R / RStudio</option>
+            <option value="excel">📗 Excel / CSV / Datos</option>
+            <option value="word">📝 Documento Word</option>
+            <option value="otro">📁 Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Etiqueta / Tema</label>
+          <input type="text" id="f-tag" placeholder="Ej. Práctica 3, Proyecto Final…"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Fecha de entrega</label>
+        <input type="date" id="f-fecha"/>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2>📎 Archivo</h2>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">
+        Formatos aceptados: <strong>PDF, R, Rmd, Excel (.xlsx/.xls), CSV, Word (.docx/.doc)</strong>, y cualquier otro archivo.
+        <br>Tamaño máximo recomendado: <strong>10 MB</strong>.
+      </p>
+
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+        <div class="dropzone-icon">☁️</div>
+        <p><strong>Haz clic</strong> o arrastra aquí tu archivo</p>
+        <p style="font-size:.78rem;margin-top:.4rem;color:#4a5568;">PDF · R · Excel · CSV · Word · y más</p>
+      </div>
+      <input type="file" id="file-input" style="display:none"
+        accept=".pdf,.r,.rmd,.rscript,.xlsx,.xls,.csv,.doc,.docx,.txt,.zip,.rar,.py,.ipynb"
+        onchange="handleFile(this.files[0])"/>
+      <div id="file-preview-area"></div>
+      <div id="file-error" style="color:#f87171;font-size:.83rem;margin-top:.5rem;display:none;"></div>
+    </div>
+
+    <button class="btn-save" onclick="subirTrabajo()" id="btn-guardar">
+      💾 Guardar Trabajo en el Portafolio
+    </button>
+
+    <div style="margin-top:1.5rem;padding:1rem;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:.83rem;color:var(--muted);">
+      <strong style="color:var(--accent2);">ℹ️ ¿Cómo funciona el almacenamiento?</strong><br>
+      Los archivos se guardan en el <strong>almacenamiento local del navegador</strong> (localStorage) de este dispositivo.
+      Para que el portafolio sea visible en GitHub Pages con tus trabajos, deberás volver a subir los archivos cada vez que uses un nuevo dispositivo.
+      Los datos de perfil y curso también se guardan localmente.
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <span class="footer-symbol">◈</span>
+    <span>Portafolio Académico</span>
+  </footer>
+
+  <script src="../js/app.js"></script>
+  <script>
+    const perfil = getPerfil();
+    if (perfil.nombre) document.getElementById('nav-name').textContent = perfil.nombre.split(' ')[0];
+
+    // Fecha por defecto = hoy
+    document.getElementById('f-fecha').valueAsDate = new Date();
+
+    // Control de acceso
+    function checkAccess() {
+      if (!isAdmin()) {
+        document.getElementById('upload-form').style.display = 'none';
+        document.getElementById('blocked-msg').style.display = '';
+      } else {
+        document.getElementById('upload-form').style.display = '';
+        document.getElementById('blocked-msg').style.display = 'none';
+      }
+    }
+    checkAccess();
+    window.onAdminLogin = checkAccess;
+
+    // ── Drag & Drop ──
+    const dz = document.getElementById('dropzone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    let selectedFile = null;
+    let fileData    = null;
+
+    const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+
+    function handleFile(file) {
+      const errEl = document.getElementById('file-error');
+      errEl.style.display = 'none';
+
+      if (file.size > MAX_SIZE) {
+        errEl.textContent = `El archivo pesa ${(file.size/1024/1024).toFixed(1)} MB, que supera el límite de 10 MB recomendado para localStorage.`;
+        errEl.style.display = '';
+        return;
+      }
+
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        fileData = e.target.result;
+        const prev = document.getElementById('file-preview-area');
+        prev.innerHTML = `
+          <div class="file-preview">
+            <span style="font-size:1.4rem">${getTypeEmoji(getFileType(file.name))}</span>
+            <span class="fname">${escHtml(file.name)}</span>
+            <span class="fsize">${(file.size/1024).toFixed(1)} KB</span>
+            <button class="btn-sm" onclick="clearFile()">✕</button>
+          </div>`;
+        // Auto-detectar tipo si no está seleccionado
+        const cat = document.getElementById('f-cat');
+        if (!cat.value) {
+          cat.value = getFileType(file.name);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearFile() {
+      selectedFile = null;
+      fileData = null;
+      document.getElementById('file-preview-area').innerHTML = '';
+      document.getElementById('file-input').value = '';
+    }
+
+    function subirTrabajo() {
+      if (!isAdmin()) { alert('Debes iniciar sesión como administrador.'); return; }
+      const titulo = document.getElementById('f-titulo').value.trim();
+      if (!titulo) {
+        showAlert('alert-upload', 'El título del trabajo es obligatorio.', 'error');
+        return;
+      }
+      if (!fileData) {
+        showAlert('alert-upload', 'Debes seleccionar un archivo.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-guardar');
+      btn.disabled = true;
+      btn.textContent = '⏳ Guardando…';
+
+      setTimeout(() => {
+        const works = getWorks();
+        const tipo = document.getElementById('f-cat').value || getFileType(selectedFile ? selectedFile.name : '');
+        const work = {
+          id:          Date.now().toString(),
+          title:       titulo,
+          description: document.getElementById('f-desc').value.trim(),
+          type:        tipo,
+          tag:         document.getElementById('f-tag').value.trim(),
+          date:        document.getElementById('f-fecha').value || new Date().toISOString().slice(0,10),
+          fileName:    selectedFile ? selectedFile.name : '',
+          fileData,
+        };
+        works.push(work);
+        try {
+          saveWorks(works);
+          showAlert('alert-upload', '✅ Trabajo guardado correctamente. <a href="trabajos.html">Ver todos los trabajos →</a>', 'success');
+          // Reset
+          document.getElementById('f-titulo').value = '';
+          document.getElementById('f-desc').value   = '';
+          document.getElementById('f-cat').value    = '';
+          document.getElementById('f-tag').value    = '';
+          document.getElementById('f-fecha').valueAsDate = new Date();
+          clearFile();
+        } catch(e) {
+          showAlert('alert-upload', '⚠️ Error al guardar: el almacenamiento local puede estar lleno. Intenta con un archivo más pequeño.', 'error');
+        }
+        btn.disabled = false;
+        btn.textContent = '💾 Guardar Trabajo en el Portafolio';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 400);
+    }
+
+    function showAlert(id, msg, type) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      if (type !== 'success') setTimeout(() => el.innerHTML = '', 4000);
+    }
+  </script>
+</body>
+</html>

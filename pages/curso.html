@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Curso & Docente · Portafolio</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <span class="icon">◈</span>
+      <span id="nav-name">Portafolio</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Inicio</a></li>
+      <li><a href="perfil.html">Mi Perfil</a></li>
+      <li><a href="curso.html" class="active">Curso & Docente</a></li>
+      <li><a href="trabajos.html">Trabajos</a></li>
+      <li class="admin-only"><a href="subir.html" class="btn-upload">+ Subir Trabajo</a></li>
+    </ul>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+
+  <div class="breadcrumb"><a href="../index.html">Inicio</a> / Curso & Docente</div>
+
+  <div class="page-header">
+    <h1>Curso & Docente</h1>
+    <p>Información del curso y del docente a cargo.</p>
+  </div>
+
+  <div class="section" style="padding-top:0; max-width:750px;">
+
+    <!-- VISTA PÚBLICA -->
+    <div id="view-mode">
+
+      <!-- Tarjeta Curso -->
+      <div class="docente-card" id="curso-view">
+        <h2>📚 Información del Curso</h2>
+        <div class="info-grid">
+          <div class="info-item"><span class="label">Nombre del Curso</span><span class="value" id="v-curso-nombre">—</span></div>
+          <div class="info-item"><span class="label">Código del Curso</span><span class="value" id="v-curso-codigo">—</span></div>
+          <div class="info-item"><span class="label">Semestre</span><span class="value" id="v-semestre">—</span></div>
+          <div class="info-item"><span class="label">Año Académico</span><span class="value" id="v-año">—</span></div>
+          <div class="info-item"><span class="label">Créditos</span><span class="value" id="v-creditos">—</span></div>
+          <div class="info-item"><span class="label">Horario</span><span class="value" id="v-horario">—</span></div>
+          <div class="info-item"><span class="label">Aula</span><span class="value" id="v-aula">—</span></div>
+          <div class="info-item"><span class="label">Modalidad</span><span class="value" id="v-modalidad">—</span></div>
+        </div>
+        <div id="v-desc-block" style="display:none;margin-top:1rem;">
+          <div class="info-item">
+            <span class="label">Descripción del Curso</span>
+            <span class="value" id="v-curso-desc" style="line-height:1.7;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta Docente -->
+      <div class="profile-card" id="docente-view">
+        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+          <div class="profile-avatar" id="docente-avatar">D</div>
+          <div class="profile-info">
+            <h2 id="v-docente-nombre">—</h2>
+            <span class="badge">Docente</span>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item"><span class="label">Grado Académico</span><span class="value" id="v-docente-grado">—</span></div>
+          <div class="info-item"><span class="label">Departamento</span><span class="value" id="v-docente-dpto">—</span></div>
+          <div class="info-item"><span class="label">Correo</span><span class="value" id="v-docente-correo">—</span></div>
+          <div class="info-item"><span class="label">Oficina / Atención</span><span class="value" id="v-docente-oficina">—</span></div>
+        </div>
+        <div id="v-docente-bio-block" style="display:none;margin-top:.5rem;">
+          <div class="info-item">
+            <span class="label">Perfil del Docente</span>
+            <span class="value" id="v-docente-bio" style="line-height:1.7;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objetivos / Sílabo -->
+      <div class="form-card" id="obj-view" style="display:none;">
+        <h2>🎯 Objetivos del Curso</h2>
+        <p id="v-objetivos" style="color:var(--text);line-height:1.8;white-space:pre-line;"></p>
+      </div>
+
+      <div class="admin-only" style="margin-top:.5rem;">
+        <button class="btn-sm" onclick="showEdit()">✏️ Editar Curso & Docente</button>
+      </div>
+
+      <div id="no-curso" style="display:none;">
+        <div class="empty-state">
+          <span>📚</span>
+          <p>Aún no hay datos del curso.<br>
+          <span class="admin-only" style="display:inline;">
+            <a href="#" onclick="showEdit()">Agregar datos</a>
+          </span></p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MODO EDICIÓN -->
+    <div id="edit-mode" style="display:none;">
+      <div class="form-card">
+        <h2>📚 Datos del Curso</h2>
+        <div id="alert-curso"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre del Curso *</label>
+            <input id="f-cnombre" placeholder="Ej. Estadística Computacional"/>
+          </div>
+          <div class="form-group">
+            <label>Código del Curso</label>
+            <input id="f-ccodigo" placeholder="Ej. EST-401"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Semestre</label>
+            <input id="f-semestre" placeholder="Ej. 2024-II"/>
+          </div>
+          <div class="form-group">
+            <label>Año Académico</label>
+            <input id="f-año" placeholder="Ej. 2024"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Créditos</label>
+            <input id="f-creditos" placeholder="Ej. 4 créditos"/>
+          </div>
+          <div class="form-group">
+            <label>Modalidad</label>
+            <select id="f-modalidad">
+              <option value="">— Seleccionar —</option>
+              <option>Presencial</option>
+              <option>Virtual</option>
+              <option>Semipresencial</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Horario</label>
+            <input id="f-horario" placeholder="Ej. Lunes y Miércoles 8:00–10:00"/>
+          </div>
+          <div class="form-group">
+            <label>Aula</label>
+            <input id="f-aula" placeholder="Ej. Lab. Informática 3"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción del Curso</label>
+          <textarea id="f-cdesc" placeholder="Breve descripción del contenido del curso..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Objetivos del Curso</label>
+          <textarea id="f-objetivos" style="min-height:120px;" placeholder="Lista los objetivos principales del curso..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>👨‍🏫 Datos del Docente</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre del Docente *</label>
+            <input id="f-dnombre" placeholder="Ej. Dr. Carlos Mamani Quispe"/>
+          </div>
+          <div class="form-group">
+            <label>Grado Académico</label>
+            <input id="f-dgrado" placeholder="Ej. Doctor en Estadística"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Departamento / Facultad</label>
+            <input id="f-ddpto" placeholder="Ej. Facultad de Ingeniería Estadística"/>
+          </div>
+          <div class="form-group">
+            <label>Correo del Docente</label>
+            <input type="email" id="f-dcorreo" placeholder="docente@univ.edu.pe"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Oficina / Horario de Atención</label>
+          <input id="f-doficina" placeholder="Ej. Of. 205 · Viernes 14:00–16:00"/>
+        </div>
+        <div class="form-group">
+          <label>Perfil / Especialización del Docente</label>
+          <textarea id="f-dbio" placeholder="Breve descripción del perfil y áreas de investigación del docente..."></textarea>
+        </div>
+        <div style="display:flex;gap:.75rem;">
+          <button class="btn-save" onclick="guardarCurso()">💾 Guardar</button>
+          <button class="btn-ghost" style="width:100%;text-align:center;cursor:pointer;border-radius:8px;" onclick="cancelEdit()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span class="footer-symbol">◈</span>
+    <span>Portafolio Académico</span>
+  </footer>
+
+  <script src="../js/app.js"></script>
+  <script>
+    let curso = getCurso();
+    const perfil = getPerfil();
+    if (perfil.nombre) document.getElementById('nav-name').textContent = perfil.nombre.split(' ')[0];
+
+    function renderView() {
+      const hasCurso = curso.nombre || curso.docente;
+      document.getElementById('no-curso').style.display = hasCurso ? 'none' : '';
+      document.getElementById('curso-view').style.display = hasCurso ? '' : 'none';
+      document.getElementById('docente-view').style.display = hasCurso ? '' : 'none';
+      if (!hasCurso) return;
+
+      document.getElementById('v-curso-nombre').textContent = curso.nombre || '—';
+      document.getElementById('v-curso-codigo').textContent = curso.codigo || '—';
+      document.getElementById('v-semestre').textContent = curso.semestre || '—';
+      document.getElementById('v-año').textContent = curso.año || '—';
+      document.getElementById('v-creditos').textContent = curso.creditos || '—';
+      document.getElementById('v-horario').textContent = curso.horario || '—';
+      document.getElementById('v-aula').textContent = curso.aula || '—';
+      document.getElementById('v-modalidad').textContent = curso.modalidad || '—';
+      if (curso.desc) {
+        document.getElementById('v-curso-desc').textContent = curso.desc;
+        document.getElementById('v-desc-block').style.display = '';
+      }
+      document.getElementById('v-docente-nombre').textContent = curso.docente || '—';
+      document.getElementById('docente-avatar').textContent = (curso.docente || 'D')[0].toUpperCase();
+      document.getElementById('v-docente-grado').textContent = curso.dgrado || '—';
+      document.getElementById('v-docente-dpto').textContent = curso.ddpto || '—';
+      document.getElementById('v-docente-correo').textContent = curso.dcorreo || '—';
+      document.getElementById('v-docente-oficina').textContent = curso.doficina || '—';
+      if (curso.dbio) {
+        document.getElementById('v-docente-bio').textContent = curso.dbio;
+        document.getElementById('v-docente-bio-block').style.display = '';
+      }
+      if (curso.objetivos) {
+        document.getElementById('v-objetivos').textContent = curso.objetivos;
+        document.getElementById('obj-view').style.display = '';
+      }
+    }
+
+    function showEdit() {
+      document.getElementById('view-mode').style.display = 'none';
+      document.getElementById('edit-mode').style.display = '';
+      document.getElementById('f-cnombre').value    = curso.nombre   || '';
+      document.getElementById('f-ccodigo').value    = curso.codigo   || '';
+      document.getElementById('f-semestre').value   = curso.semestre || '';
+      document.getElementById('f-año').value        = curso.año      || '';
+      document.getElementById('f-creditos').value   = curso.creditos || '';
+      document.getElementById('f-modalidad').value  = curso.modalidad|| '';
+      document.getElementById('f-horario').value    = curso.horario  || '';
+      document.getElementById('f-aula').value       = curso.aula     || '';
+      document.getElementById('f-cdesc').value      = curso.desc     || '';
+      document.getElementById('f-objetivos').value  = curso.objetivos|| '';
+      document.getElementById('f-dnombre').value    = curso.docente  || '';
+      document.getElementById('f-dgrado').value     = curso.dgrado   || '';
+      document.getElementById('f-ddpto').value      = curso.ddpto    || '';
+      document.getElementById('f-dcorreo').value    = curso.dcorreo  || '';
+      document.getElementById('f-doficina').value   = curso.doficina || '';
+      document.getElementById('f-dbio').value       = curso.dbio     || '';
+    }
+
+    function cancelEdit() {
+      document.getElementById('edit-mode').style.display = 'none';
+      document.getElementById('view-mode').style.display = '';
+    }
+
+    function guardarCurso() {
+      const nombre = document.getElementById('f-cnombre').value.trim();
+      if (!nombre) {
+        showAlert('alert-curso', 'El nombre del curso es obligatorio.', 'error');
+        return;
+      }
+      curso = {
+        nombre,
+        codigo:    document.getElementById('f-ccodigo').value.trim(),
+        semestre:  document.getElementById('f-semestre').value.trim(),
+        año:       document.getElementById('f-año').value.trim(),
+        creditos:  document.getElementById('f-creditos').value.trim(),
+        modalidad: document.getElementById('f-modalidad').value,
+        horario:   document.getElementById('f-horario').value.trim(),
+        aula:      document.getElementById('f-aula').value.trim(),
+        desc:      document.getElementById('f-cdesc').value.trim(),
+        objetivos: document.getElementById('f-objetivos').value.trim(),
+        docente:   document.getElementById('f-dnombre').value.trim(),
+        dgrado:    document.getElementById('f-dgrado').value.trim(),
+        ddpto:     document.getElementById('f-ddpto').value.trim(),
+        dcorreo:   document.getElementById('f-dcorreo').value.trim(),
+        doficina:  document.getElementById('f-doficina').value.trim(),
+        dbio:      document.getElementById('f-dbio').value.trim(),
+      };
+      localStorage.setItem('curso', JSON.stringify(curso));
+      cancelEdit();
+      renderView();
+    }
+
+    function showAlert(id, msg, type) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      setTimeout(() => el.innerHTML = '', 3500);
+    }
+
+    renderView();
+    window.onAdminLogin = () => { renderView(); showEdit(); };
+  </script>
+</body>
+</html>
